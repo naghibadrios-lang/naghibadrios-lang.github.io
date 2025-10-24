@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>بازی رنگ و شکل</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      text-align: center;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 15px;
+    }
+    .designer {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 10px;
+      font-style: italic;
+      letter-spacing: 1px;
+    }
+    h1 {
+      color: #2c3e50;
+      font-size: 26px;
+      margin: 5px 0;
+    }
+    table {
+      margin: 15px auto;
+      border-collapse: collapse;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    td {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #4a5568;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 26px;
+      cursor: pointer;
+      padding: 0;
+    }
+    .locked {
+      background: #e2e8f0;
+      cursor: not-allowed;
+      font-size: 22px;
+    }
+    .timer-cell {
+      background: #e0f7fa !important;
+      color: #006064;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: default;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4px;
+    }
+    .timer-cell span {
+      display: block;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .shape-label {
+      display: block;
+      font-size: 10px;
+      color: #4a5568;
+      margin-top: 2px;
+    }
+    .editable {
+      background: white;
+    }
+
+    .color-btn {
+      width: 50px;
+      height: 50px;
+      padding: 0;
+      margin: 6px;
+      border: 2px solid #4a5568;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .controls {
+      margin: 12px 0;
+    }
+
+    button.shape-btn {
+      margin: 6px;
+      padding: 8px 12px;
+      font-size: 18px;
+      cursor: pointer;
+      border: 1px solid #4a5568;
+      border-radius: 6px;
+      background: white;
+    }
+
+    #message {
+      margin: 12px;
+      min-height: 26px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #c62828;
+    }
+    #message.win {
+      color: #2e7d32;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      width: 85%;
+      max-width: 480px;
+      border-radius: 10px;
+      direction: rtl;
+    }
+    .close {
+      float: left;
+      font-size: 24px;
+      cursor: pointer;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="designer">Design by Badr</div>
+  <h1>بازی رنگ و شکل</h1>
+
+  <div class="controls">
+    <button onclick="showHelp()">راهنما</button>
+    <button onclick="resetGame()">دوباره</button>
+  </div>
+
+  <table id="gameGrid">
+    <tr>
+      <td id="timerCell" class="locked timer-cell">
+        ⏱️<br><span id="timeValue">0</span>
+      </td>
+      <td class="locked" style="background-color: blue;"></td>
+      <td class="locked" style="background-color: gold;"></td>
+      <td class="locked" style="background-color: green;"></td>
+      <td class="locked" style="background-color: red;"></td>
+    </tr>
+    <tr>
+      <td class="locked">
+        ●<span class="shape-label">دایره</span>
+      </td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+    </tr>
+    <tr>
+      <td class="locked">
+        ★<span class="shape-label">ستاره</span>
+      </td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+    </tr>
+    <tr>
+      <td class="locked">
+        ▲<span class="shape-label">مثلث</span>
+      </td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+      <td class="editable"></td>
+    </tr>
+  </table>
+
+  <div class="controls">
+    <h3>رنگ را انتخاب کن:</h3>
+    <button class="color-btn" style="background-color: blue;" onclick="setColor('blue')"></button>
+    <button class="color-btn" style="background-color: gold;" onclick="setColor('gold')"></button>
+    <button class="color-btn" style="background-color: green;" onclick="setColor('green')"></button>
+    <button class="color-btn" style="background-color: red;" onclick="setColor('red')"></button>
+  </div>
+
+  <div class="controls">
+    <h3>شکل را انتخاب کن:</h3>
+    <button class="shape-btn" onclick="setShape('●')">●</button>
+    <button class="shape-btn" onclick="setShape('★')">★</button>
+    <button class="shape-btn" onclick="setShape('▲')">▲</button>
+  </div>
+
+  <div id="message"></div>
+
+  <!-- Modal راهنما -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeHelp()">&times;</span>
+      <h3>راهنمای بازی</h3>
+      <p>هر خانه باید شکل ردیفش + رنگ ستونش را داشته باشد.</p>
+      <p>روی یک رنگ و یک شکل کلیک کن، بعد روی خانهٔ خالی.</p>
+      <p>اگر درست باشد، شکل با رنگ مناسب نمایش داده می‌شود.</p>
+    </div>
+  </div>
+
+  <script>
+    let selectedColor = null;
+    let selectedShape = null;
+    let timerInterval = null;
+    let seconds = 0;
+    let gameFinished = false;
+
+    const correctRules = {
+      '1,1': ['blue', '●'], '1,2': ['gold', '●'], '1,3': ['green', '●'], '1,4': ['red', '●'],
+      '2,1': ['blue', '★'], '2,2': ['gold', '★'], '2,3': ['green', '★'], '2,4': ['red', '★'],
+      '3,1': ['blue', '▲'], '3,2': ['gold', '▲'], '3,3': ['green', '▲'], '3,4': ['red', '▲']
+    };
+
+    function setColor(color) {
+      selectedColor = color;
+      showMessage('رنگ انتخاب شد');
+    }
+
+    function setShape(shape) {
+      selectedShape = shape;
+      showMessage('شکل انتخاب شد');
+    }
+
+    function showMessage(text) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = '';
+    }
+
+    function startTimer() {
+      stopTimer();
+      seconds = 0;
+      document.getElementById('timeValue').textContent = seconds;
+      gameFinished = false;
+      timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById('timeValue').textContent = seconds;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startTimer();
+      document.querySelectorAll('.editable').forEach(cell => {
+        cell.addEventListener('click', handleCellClick);
+      });
+    });
+
+    function handleCellClick() {
+      if (gameFinished || !selectedColor || !selectedShape) {
+        if (!selectedColor || !selectedShape) {
+          showMessage('رنگ و شکل را انتخاب کن!');
+        }
+        return;
+      }
+
+      const row = this.parentElement.rowIndex;
+      const col = this.cellIndex;
+      const key = `${row},${col}`;
+      const correct = correctRules[key];
+
+      if (correct && selectedColor === correct[0] && selectedShape === correct[1]) {
+        this.textContent = selectedShape;
+        this.style.color = selectedColor;
+        this.dataset.color = selectedColor;
+        this.dataset.shape = selectedShape;
+        showMessage('درسته! ✅');
+        checkWin();
+      } else {
+        showMessage('اشتباه! ❌');
+      }
+    }
+
+    function checkWin() {
+      const allFilled = Array.from(document.querySelectorAll('.editable'))
+        .every(cell => cell.dataset.color && cell.dataset.shape);
+      if (allFilled && !gameFinished) {
+        gameFinished = true;
+        stopTimer();
+        const msg = document.getElementById('message');
+        msg.textContent = `🎉 بسیار عالی! زمان شما: ${seconds} ثانیه 🎉`;
+        msg.className = 'win';
+      }
+    }
+
+    function resetGame() {
+      document.querySelectorAll('.editable').forEach(cell => {
+        cell.textContent = '';
+        cell.style.color = '';
+        cell.removeAttribute('data-color');
+        cell.removeAttribute('data-shape');
+      });
+      selectedColor = null;
+      selectedShape = null;
+      showMessage('بازی از نو شروع شد');
+      startTimer();
+    }
+
+    function showHelp() {
+      document.getElementById('helpModal').style.display = 'block';
+    }
+
+    function closeHelp() {
+      document.getElementById('helpModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('helpModal');
+      if (event.target === modal) modal.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
