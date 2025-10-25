@@ -3,154 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>منظومه شمسی — نسخهٔ جذاب</title>
+  <title>بازی رنگ‌آمیزی کسرها</title>
   <style>
     body {
       font-family: Tahoma, sans-serif;
-      background: #000;
-      color: white;
+      background: #f5f7fa;
       margin: 0;
-      padding: 10px;
+      padding: 15px;
       text-align: center;
-      position: relative;
-      transition: background 0.5s;
-    }
-    body.day-mode {
-      background: #87CEEB;
-      color: #222;
     }
     .designer {
       font-size: 14px;
-      color: #aaa;
-      margin: 8px 0;
+      color: #666;
+      margin-bottom: 8px;
       font-style: italic;
     }
     h1 {
-      font-size: 20px;
+      color: #2c3e50;
+      font-size: 22px;
       margin: 10px 0;
-      color: #ffeb3b;
     }
-    body.day-mode h1 {
-      color: #e67e22;
-    }
-
-    #helpBtn, #themeBtn, #hintBtn {
-      position: absolute;
-      top: 10px;
-      padding: 6px 10px;
-      background: #333;
-      color: white;
-      border: 1px solid #555;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      z-index: 30;
-    }
-    body.day-mode #helpBtn,
-    body.day-mode #themeBtn,
-    body.day-mode #hintBtn {
-      background: #f0f0f0;
-      color: #333;
-      border-color: #999;
-    }
-    #helpBtn { right: 10px; }
-    #themeBtn { right: 70px; }
-    #hintBtn { right: 130px; }
-
-    #errorCounter {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 14px;
-      color: #ff9800;
-      background: rgba(0,0,0,0.5);
-      padding: 4px 8px;
-      border-radius: 6px;
-      z-index: 30;
-      font-weight: bold;
-    }
-    body.day-mode #errorCounter {
-      background: rgba(255,255,255,0.7);
-      color: #e67e22;
-    }
-
-    #progressBar {
-      margin: 8px 0;
-      font-size: 18px;
-      min-height: 24px;
-      font-family: monospace;
-    }
-
-    #solarSystem {
-      position: relative;
-      width: 340px;
-      height: 340px;
-      margin: 5px auto;
-    }
-    .sun {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 50px;
-      height: 50px;
-      background: radial-gradient(circle, #ffeb3b, #ff9800);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 20px #ffeb3b;
-      z-index: 10;
-    }
-    body.day-mode .sun {
-      background: radial-gradient(circle, #f1c40f, #e67e22);
-      box-shadow: 0 0 15px #f1c40f;
-    }
-    .orbit {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      border: 1px dashed rgba(255,255,255,0.15);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    body.day-mode .orbit {
-      border-color: rgba(0,0,0,0.2);
-    }
-    .planet {
-      position: absolute;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+    #gameHeader {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 5;
-      font-size: 9px;
-      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    #helpBtn {
+      padding: 6px 12px;
+      background: #3498db;
       color: white;
-      text-shadow: 0 0 2px black, 0 0 2px black;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    #scoreTimer {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .controls {
+      margin: 15px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .type-btn {
+      padding: 10px 15px;
+      border: 2px solid #555;
+      border-radius: 8px;
+      background: white;
+      font-size: 16px;
+      cursor: pointer;
+      min-width: 120px;
+    }
+    .type-btn:hover {
+      opacity: 0.9;
+    }
+    .type-btn.selected {
+      font-weight: bold;
+    }
+    .blue { background: #d1e7ff; }
+    .green { background: #d4edda; }
+    .red { background: #f8d7da; }
+    .orange { background: #ffe5b4; }
+
+    table {
+      margin: 20px auto;
+      border-collapse: separate;
+      border-spacing: 6px;
+    }
+    td {
+      width: 80px;
+      height: 80px;
+      border: 2px solid #444;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 18px;
+      cursor: pointer;
+      background: white;
       user-select: none;
-      transition: transform 0.2s;
+      line-height: 1.2;
     }
-    body.day-mode .planet {
-      text-shadow: 0 0 2px white, 0 0 2px white;
+    td.correct {
+      border: 3px solid #28a745;
     }
-    .planet.selected {
-      transform: scale(1.3);
-      box-shadow: 0 0 12px white;
+    td.error {
+      animation: shake 0.5s;
     }
-    body.day-mode .planet.selected {
-      box-shadow: 0 0 12px black;
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
 
     #message {
-      margin: 10px;
-      min-height: 24px;
-      font-size: 17px;
+      margin: 15px;
+      min-height: 26px;
+      font-size: 18px;
       font-weight: bold;
-      color: #4caf50;
+      color: #28a745;
     }
     #message.error {
-      color: #f44336;
+      color: #dc3545;
     }
 
     /* Modal راهنما */
@@ -160,324 +117,227 @@
       z-index: 100;
       left: 0; top: 0;
       width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.8);
+      background-color: rgba(0,0,0,0.7);
     }
     .modal-content {
-      background: #222;
+      background: white;
       margin: 15% auto;
       padding: 20px;
       width: 85%;
-      max-width: 400px;
+      max-width: 450px;
       border-radius: 12px;
       direction: rtl;
-      color: white;
-      border: 1px solid #444;
-    }
-    body.day-mode .modal-content {
-      background: #f9f9f9;
-      color: #333;
-      border-color: #ccc;
     }
     .close {
-      color: #aaa;
+      color: #888;
       float: left;
       font-size: 24px;
-      font-weight: bold;
       cursor: pointer;
     }
-    .close:hover {
-      color: white;
+
+    /* سبک کسر عمودی */
+    .fraction {
+      display: inline-block;
+      text-align: center;
+      font-size: 18px;
     }
-    body.day-mode .close {
-      color: #888;
+    .fraction sup, .fraction sub {
+      display: block;
+      font-size: 16px;
+      font-family: Tahoma, sans-serif;
     }
-    body.day-mode .close:hover {
-      color: #333;
+    .fraction hr {
+      margin: 1px 0;
+      border: 0;
+      border-top: 1px solid #000;
+      width: 80%;
     }
   </style>
 </head>
 <body>
   <div class="designer">Design by Badr</div>
-  <h1>منظومهٔ شمسی</h1>
+  <h1>بازی رنگ‌آمیزی کسرها</h1>
 
-  <button id="helpBtn" onclick="showHelp()">راهنما</button>
-  <button id="themeBtn" onclick="toggleTheme()">🌙</button>
-  <button id="hintBtn" onclick="useHint()">کمک</button>
-  <div id="errorCounter">اشتباهات: 0 از 2</div>
-
-  <div id="progressBar">●●●●●●●●</div>
-
-  <div id="solarSystem">
-    <div class="sun"></div>
+  <div id="gameHeader">
+    <button id="helpBtn" onclick="showHelp()">راهنما</button>
+    <div id="scoreTimer">امتیاز: 0 | زمان: 0s</div>
   </div>
 
-  <div id="message">روی یک سیاره کلیک کن، بعد جای درستش را انتخاب کن.</div>
+  <div class="controls">
+    <button class="type-btn blue" onclick="selectType('less')">کسر سبک<br><small>(کوچک‌تر از واحد)</small></button>
+    <button class="type-btn green" onclick="selectType('equal')">کسر کامل<br><small>(برابر واحد)</small></button>
+    <button class="type-btn red" onclick="selectType('greater')">کسر سنگین<br><small>(بزرگ‌تر از واحد)</small></button>
+    <button class="type-btn orange" onclick="selectType('mixed')">عدد ترکیبی<br><small>(عدد مخلوط)</small></button>
+  </div>
+
+  <table id="fractionGrid">
+    <!-- خانه‌ها به‌صورت پویا پر می‌شوند -->
+  </table>
+
+  <div id="message">یک نوع کسر را انتخاب کن، بعد روی خانه‌های مربوطه کلیک کن.</div>
 
   <!-- Modal راهنما -->
   <div id="helpModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeHelp()">&times;</span>
       <h3>راهنمای بازی</h3>
-      <p>سیاره‌ها جابه‌جا شده‌اند!</p>
-      <ol style="text-align: right;">
-        <li>روی یک سیاره کلیک کن.</li>
-        <li>بعد روی سیارهٔ دیگر کلیک کن تا جایشان عوض شود.</li>
-        <li>فقط <strong>۲ اشتباه</strong> مجاز است.</li>
-        <li>از دکمهٔ «کمک» فقط یک بار استفاده کن.</li>
-        <li>با دکمهٔ 🌙/☀️ حالت شب و روز را عوض کن.</li>
-      </ol>
+      <p>هدف: هر نوع کسر را با رنگ درستش رنگ کن.</p>
+      <ul style="text-align: right;">
+        <li><span style="color:blue">🔵 کسر سبک</span>: صورت کوچک‌تر از مخرج</li>
+        <li><span style="color:green">🟢 کسر کامل</span>: صورت برابر مخرج</li>
+        <li><span style="color:red">🔴 کسر سنگین</span>: صورت بزرگ‌تر از مخرج</li>
+        <li><span style="color:orange">🟠 عدد ترکیبی</span>: عدد صحیح + کسر</li>
+      </ul>
+      <p>روی یک دکمهٔ رنگ کلیک کن، بعد روی خانه‌های درست.</p>
     </div>
   </div>
 
   <script>
-    const correctOrder = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-    const planetNames = {
-      mercury: 'عطارد', venus: 'زهره', earth: 'زمین', mars: 'مریخ',
-      jupiter: 'مشتری', saturn: 'زحل', uranus: 'اورانوس', neptune: 'نپتون'
-    };
-    const initialWrongOrder = ['venus', 'earth', 'mars', 'mercury', 'saturn', 'jupiter', 'neptune', 'uranus'];
-    const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+    // تابع تبدیل کسر ساده به فرمت عمودی
+    function formatFraction(fractionStr) {
+      if (fractionStr.includes(' ')) {
+        // عدد مخلوط: مثل "۲ ۱/۳"
+        const parts = fractionStr.split(' ');
+        const whole = parts[0];
+        const frac = parts[1];
+        const [num, den] = frac.split('/');
+        return `${whole}&nbsp;<span class="fraction"><sup>${num}</sup><hr><sub>${den}</sub></span>`;
+      } else {
+        // کسر ساده: مثل "۳/۵"
+        const [num, den] = fractionStr.split('/');
+        return `<span class="fraction"><sup>${num}</sup><hr><sub>${den}</sub></span>`;
+      }
+    }
 
-    let selectedPlanetEl = null;
-    let errorCount = 0;
-    const maxErrors = 2;
-    let hintUsed = false;
-    let isDayMode = false;
-
-    const planetStyles = {
-      mercury: { bg: '#b0b0b0' },
-      venus: { bg: '#e39e1c' },
-      earth: { bg: 'radial-gradient(circle, #2196f3 60%, #4caf50 100%)' },
-      mars: { bg: '#cd5c5c' },
-      jupiter: { 
-        bg: '#d8ca9d',
-        img: 'repeating-linear-gradient(to right, transparent 0 4px, rgba(160,100,60,0.6) 4px 8px)'
-      },
-      saturn: { bg: '#e3e0c0' },
-      uranus: { bg: '#a6d3d8' },
-      neptune: { bg: '#4b6cb7' }
+    // لیست کسرها با اعداد لاتین (برای پردازش آسان)
+    const fractions = {
+      less: ['1/2', '2/3', '3/4', '1/5', '2/5', '3/5', '4/5', '1/6', '5/6', '2/7', '3/7', '4/9'],
+      equal: ['1/1', '2/2', '3/3', '4/4', '5/5', '6/6', '7/7', '8/8'],
+      greater: ['3/2', '4/3', '5/2', '7/3', '9/4', '6/5', '10/3', '8/5', '7/2', '9/2'],
+      mixed: ['1 1/2', '2 1/3', '1 2/3', '3 1/4', '2 3/5', '4 2/7', '1 3/4', '2 1/5']
     };
 
-    // صداها
-    function playSound(type) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'sine';
-        
-        if (type === 'win') {
-          osc.frequency.setValueAtTime(600, ctx.currentTime);
-          osc.frequency.setValueAtTime(800, ctx.currentTime + 0.1);
-          gain.gain.setValueAtTime(0.1, ctx.currentTime);
-        } else if (type === 'error') {
-          osc.frequency.setValueAtTime(200, ctx.currentTime);
-          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    // تبدیل اعداد لاتین به فارسی
+    function toPersianDigits(str) {
+      return str.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+
+    let selectedType = null;
+    let score = 0;
+    let startTime = null;
+    let timerInterval = null;
+    let correctCount = 0;
+    const totalCells = 16;
+
+    function getRandomItems(arr, count) {
+      const shuffled = [...arr].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    function generateGrid() {
+      const grid = document.getElementById('fractionGrid');
+      grid.innerHTML = '';
+
+      const items = [
+        ...getRandomItems(fractions.less, 4).map(v => ({value: v, type: 'less'})),
+        ...getRandomItems(fractions.equal, 4).map(v => ({value: v, type: 'equal'})),
+        ...getRandomItems(fractions.greater, 4).map(v => ({value: v, type: 'greater'})),
+        ...getRandomItems(fractions.mixed, 4).map(v => ({value: v, type: 'mixed'}))
+      ];
+
+      items.sort(() => 0.5 - Math.random());
+
+      for (let i = 0; i < 4; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < 4; j++) {
+          const cell = document.createElement('td');
+          const item = items[i * 4 + j];
+          const persianValue = toPersianDigits(item.value);
+          cell.innerHTML = formatFraction(persianValue);
+          cell.dataset.type = item.type;
+          cell.addEventListener('click', () => handleCellClick(cell));
+          row.appendChild(cell);
         }
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        setTimeout(() => ctx.close(), 300);
-      } catch (e) {
-        // صدا اختیاری است
+        grid.appendChild(row);
       }
     }
 
-    // انیمیشن جابجایی
-    function animateSwap(planet1, planet2, callback) {
-      const rect1 = planet1.getBoundingClientRect();
-      const rect2 = planet2.getBoundingClientRect();
-      const dx = rect2.left - rect1.left;
-      const dy = rect2.top - rect1.top;
-
-      planet1.style.transition = 'none';
-      planet2.style.transition = 'none';
-      planet1.style.transform = `translate(${dx}px, ${dy}px)`;
-      planet2.style.transform = `translate(${-dx}px, ${-dy}px)`;
-
-      setTimeout(() => {
-        planet1.style.transition = 'transform 0.3s';
-        planet2.style.transition = 'transform 0.3s';
-        planet1.style.transform = '';
-        planet2.style.transform = '';
-        if (callback) setTimeout(callback, 300);
-      }, 10);
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        updateScoreDisplay(elapsed);
+      }, 1000);
     }
 
-    function createSolarSystem() {
-      const system = document.getElementById('solarSystem');
-      const centerX = 170;
-      const centerY = 170;
-
-      while (system.children.length > 1) system.removeChild(system.lastChild);
-
-      for (let i = 0; i < 8; i++) {
-        const radius = 50 + i * 26;
-        const orbit = document.createElement('div');
-        orbit.className = 'orbit';
-        orbit.style.width = `${radius * 2}px`;
-        orbit.style.height = `${radius * 2}px`;
-        system.appendChild(orbit);
-
-        const planet = document.createElement('div');
-        planet.className = 'planet';
-        planet.dataset.orbit = i;
-        const type = initialWrongOrder[i];
-        planet.dataset.type = type;
-        planet.textContent = planetNames[type];
-
-        const style = planetStyles[type];
-        planet.style.background = style.bg;
-        if (style.img) planet.style.backgroundImage = style.img;
-
-        const angle = angles[i] * Math.PI / 180;
-        const x = centerX + radius * Math.cos(angle) - 18;
-        const y = centerY + radius * Math.sin(angle) - 18;
-        planet.style.left = `${x}px`;
-        planet.style.top = `${y}px`;
-
-        planet.addEventListener('click', () => handlePlanetClick(planet));
-        system.appendChild(planet);
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
       }
-      updateProgressBar();
     }
 
-    function handlePlanetClick(planet) {
-      if (selectedPlanetEl === planet) {
-        planet.classList.remove('selected');
-        selectedPlanetEl = null;
-        showMessage('انتخاب لغو شد.');
+    function updateScoreDisplay(time = 0) {
+      document.getElementById('scoreTimer').textContent = `امتیاز: ${score} | زمان: ${time}s`;
+    }
+
+    function selectType(type) {
+      selectedType = type;
+      document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
+      const colorClass = 
+        type === 'less' ? 'blue' : 
+        type === 'equal' ? 'green' : 
+        type === 'greater' ? 'red' : 'orange';
+      document.querySelector(`.type-btn.${colorClass}`).classList.add('selected');
+      showMessage(`نوع "${getTypeName(type)}" انتخاب شد.`);
+    }
+
+    function getTypeName(type) {
+      return {
+        less: 'کسر سبک',
+        equal: 'کسر کامل',
+        greater: 'کسر سنگین',
+        mixed: 'عدد ترکیبی'
+      }[type];
+    }
+
+    function handleCellClick(cell) {
+      if (!selectedType) {
+        showMessage('اول یک نوع کسر را انتخاب کن!', true);
         return;
       }
 
-      if (!selectedPlanetEl) {
-        document.querySelectorAll('.planet').forEach(p => p.classList.remove('selected'));
-        planet.classList.add('selected');
-        selectedPlanetEl = planet;
-        showMessage(`سیارهٔ ${planet.textContent} انتخاب شد.`);
-      } else {
-        const fromOrbit = parseInt(selectedPlanetEl.dataset.orbit);
-        const toOrbit = parseInt(planet.dataset.orbit);
-        if (fromOrbit === toOrbit) {
-          selectedPlanetEl.classList.remove('selected');
-          selectedPlanetEl = null;
-          return;
+      const correctType = cell.dataset.type;
+      if (selectedType === correctType) {
+        cell.style.backgroundColor = 
+          selectedType === 'less' ? '#d1e7ff' :
+          selectedType === 'equal' ? '#d4edda' :
+          selectedType === 'greater' ? '#f8d7da' : '#ffe5b4';
+        cell.classList.add('correct');
+        score += 10;
+        correctCount++;
+        updateScoreDisplay(Math.floor((Date.now() - startTime) / 1000));
+        showMessage('آفرین! ✅');
+        if (correctCount === totalCells) {
+          stopTimer();
+          const finalTime = Math.floor((Date.now() - startTime) / 1000);
+          setTimeout(() => {
+            showMessage(`🎉 تبریک! امتیاز: ${score} — زمان: ${finalTime} ثانیه 🎉`);
+          }, 500);
         }
-
-        const tempType = selectedPlanetEl.dataset.type;
-        const tempText = selectedPlanetEl.textContent;
-
-        // انیمیشن + جابجایی
-        animateSwap(selectedPlanetEl, planet, () => {
-          selectedPlanetEl.dataset.type = planet.dataset.type;
-          selectedPlanetEl.textContent = planet.textContent;
-          planet.dataset.type = tempType;
-          planet.textContent = tempText;
-
-          updatePlanetAppearance(selectedPlanetEl);
-          updatePlanetAppearance(planet);
-
-          if (planet.dataset.type !== correctOrder[toOrbit]) {
-            errorCount++;
-            updateErrorDisplay();
-            playSound('error');
-            showMessage('❌ اشتباه! این سیاره مال این جا نیست.', true);
-            if (errorCount >= maxErrors) {
-              setTimeout(() => resetGame(), 1200);
-            }
-          } else {
-            playSound('win');
-            showMessage('آفرین! ✅');
-          }
-
-          selectedPlanetEl.classList.remove('selected');
-          selectedPlanetEl = null;
-          updateProgressBar();
-        });
-      }
-    }
-
-    function updatePlanetAppearance(planet) {
-      const type = planet.dataset.type;
-      const style = planetStyles[type];
-      planet.style.background = style.bg;
-      if (style.img) {
-        planet.style.backgroundImage = style.img;
       } else {
-        planet.style.backgroundImage = 'none';
+        cell.classList.add('error');
+        setTimeout(() => cell.classList.remove('error'), 500);
+        score = Math.max(0, score - 5);
+        updateScoreDisplay(Math.floor((Date.now() - startTime) / 1000));
+        showMessage('❌ اشتباه! این کسر مال این گروه نیست.', true);
       }
-    }
-
-    function updateErrorDisplay() {
-      document.getElementById('errorCounter').textContent = `اشتباهات: ${errorCount} از ${maxErrors}`;
-    }
-
-    function updateProgressBar() {
-      const planets = document.querySelectorAll('.planet');
-      let correctCount = 0;
-      for (let i = 0; i < planets.length; i++) {
-        if (planets[i].dataset.type === correctOrder[i]) correctCount++;
-      }
-      const filled = '●'.repeat(correctCount);
-      const empty = '○'.repeat(8 - correctCount);
-      document.getElementById('progressBar').textContent = filled + empty;
     }
 
     function showMessage(text, isError = false) {
       const msg = document.getElementById('message');
       msg.textContent = text;
       msg.className = isError ? 'error' : '';
-    }
-
-    function checkWin() {
-      const planets = document.querySelectorAll('.planet');
-      for (let i = 0; i < planets.length; i++) {
-        if (planets[i].dataset.type !== correctOrder[i]) return false;
-      }
-      playSound('win');
-      showMessage('🎉 آفرین! منظومهٔ شمسی درست شد! 🎉');
-      return true;
-    }
-
-    function resetGame() {
-      errorCount = 0;
-      selectedPlanetEl = null;
-      hintUsed = false;
-      document.getElementById('hintBtn').disabled = false;
-      document.getElementById('hintBtn').textContent = 'کمک';
-      updateErrorDisplay();
-      createSolarSystem();
-      showMessage('بازی از اول شروع شد. دو اشتباه مجاز است.');
-    }
-
-    function useHint() {
-      if (hintUsed) return;
-      hintUsed = true;
-      document.getElementById('hintBtn').disabled = true;
-      document.getElementById('hintBtn').textContent = 'استفاده شد';
-
-      // نمایش موقت مدارهای درست
-      const planets = document.querySelectorAll('.planet');
-      planets.forEach((p, i) => {
-        if (p.dataset.type !== correctOrder[i]) {
-          const orbit = p.parentElement.querySelector(`.orbit:nth-child(${i+1})`);
-          if (orbit) {
-            orbit.style.borderColor = isDayMode ? '#27ae60' : '#2ecc71';
-            orbit.style.borderWidth = '2px';
-            setTimeout(() => {
-              orbit.style.borderColor = isDayMode ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.15)';
-              orbit.style.borderWidth = '1px';
-            }, 3000);
-          }
-        }
-      });
-    }
-
-    function toggleTheme() {
-      isDayMode = !isDayMode;
-      document.body.classList.toggle('day-mode', isDayMode);
-      document.getElementById('themeBtn').textContent = isDayMode ? '☀️' : '🌙';
     }
 
     function showHelp() {
@@ -493,14 +353,8 @@
       if (event.target === modal) closeHelp();
     }
 
-    createSolarSystem();
-
-    const observer = new MutationObserver(() => checkWin());
-    observer.observe(document.getElementById('solarSystem'), {
-      attributes: true,
-      attributeFilter: ['data-type'],
-      subtree: true
-    });
+    generateGrid();
+    startTimer();
   </script>
 </body>
 </html>
