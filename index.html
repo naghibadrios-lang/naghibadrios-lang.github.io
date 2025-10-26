@@ -3,358 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>بازی رنگ‌آمیزی کسرها</title>
+  <title>بازی‌های آموزشی — Design by Badr</title>
   <style>
     body {
-      font-family: Tahoma, sans-serif;
-      background: #f5f7fa;
+      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #f8bbd0);
       margin: 0;
-      padding: 15px;
+      padding: 20px;
       text-align: center;
     }
     .designer {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 8px;
+      font-size: 16px;
+      color: #5d4037;
+      margin: 15px 0;
       font-style: italic;
+      font-weight: bold;
     }
     h1 {
-      color: #2c3e50;
-      font-size: 22px;
-      margin: 10px 0;
+      color: #1a237e;
+      font-size: 28px;
+      margin: 20px 0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
-    #gameHeader {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    #helpBtn {
-      padding: 6px 12px;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-    #scoreTimer {
-      font-size: 16px;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-    .controls {
-      margin: 15px 0;
+    .games-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
     }
-    .type-btn {
-      padding: 10px 15px;
-      border: 2px solid #555;
+    .game-card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .game-card h2 {
+      margin-top: 0;
+      color: #283593;
+      font-size: 22px;
+    }
+    .game-card p {
+      color: #424242;
+      font-size: 16px;
+      margin: 12px 0;
+    }
+    .game-card button {
+      padding: 12px 24px;
+      font-size: 17px;
+      background: #3f51b5;
+      color: white;
+      border: none;
       border-radius: 8px;
-      background: white;
-      font-size: 16px;
       cursor: pointer;
-      min-width: 120px;
-    }
-    .type-btn:hover {
-      opacity: 0.9;
-    }
-    .type-btn.selected {
       font-weight: bold;
+      transition: background 0.3s;
     }
-    .blue { background: #d1e7ff; }
-    .green { background: #d4edda; }
-    .red { background: #f8d7da; }
-    .orange { background: #ffe5b4; }
-
-    table {
-      margin: 20px auto;
-      border-collapse: separate;
-      border-spacing: 6px;
-    }
-    td {
-      width: 80px;
-      height: 80px;
-      border: 2px solid #444;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 18px;
-      cursor: pointer;
-      background: white;
-      user-select: none;
-      line-height: 1.2;
-    }
-    td.correct {
-      border: 3px solid #28a745;
-    }
-    td.error {
-      animation: shake 0.5s;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-
-    #message {
-      margin: 15px;
-      min-height: 26px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #28a745;
-    }
-    #message.error {
-      color: #dc3545;
-    }
-
-    /* Modal راهنما */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 100;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.7);
-    }
-    .modal-content {
-      background: white;
-      margin: 15% auto;
-      padding: 20px;
-      width: 85%;
-      max-width: 450px;
-      border-radius: 12px;
-      direction: rtl;
-    }
-    .close {
-      color: #888;
-      float: left;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    /* سبک کسر عمودی */
-    .fraction {
-      display: inline-block;
-      text-align: center;
-      font-size: 18px;
-    }
-    .fraction sup, .fraction sub {
-      display: block;
-      font-size: 16px;
-      font-family: Tahoma, sans-serif;
-    }
-    .fraction hr {
-      margin: 1px 0;
-      border: 0;
-      border-top: 1px solid #000;
-      width: 80%;
+    .game-card button:hover {
+      background: #303f9f;
     }
   </style>
 </head>
 <body>
   <div class="designer">Design by Badr</div>
-  <h1>بازی رنگ‌آمیزی کسرها</h1>
+  <h1>🎮 بازی‌های آموزشی</h1>
 
-  <div id="gameHeader">
-    <button id="helpBtn" onclick="showHelp()">راهنما</button>
-    <div id="scoreTimer">امتیاز: 0 | زمان: 0s</div>
-  </div>
+  <div class="games-container">
 
-  <div class="controls">
-    <button class="type-btn blue" onclick="selectType('less')">کسر سبک<br><small>(کوچک‌تر از واحد)</small></button>
-    <button class="type-btn green" onclick="selectType('equal')">کسر کامل<br><small>(برابر واحد)</small></button>
-    <button class="type-btn red" onclick="selectType('greater')">کسر سنگین<br><small>(بزرگ‌تر از واحد)</small></button>
-    <button class="type-btn orange" onclick="selectType('mixed')">عدد ترکیبی<br><small>(عدد مخلوط)</small></button>
-  </div>
-
-  <table id="fractionGrid">
-    <!-- خانه‌ها به‌صورت پویا پر می‌شوند -->
-  </table>
-
-  <div id="message">یک نوع کسر را انتخاب کن، بعد روی خانه‌های مربوطه کلیک کن.</div>
-
-  <!-- Modal راهنما -->
-  <div id="helpModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeHelp()">&times;</span>
-      <h3>راهنمای بازی</h3>
-      <p>هدف: هر نوع کسر را با رنگ درستش رنگ کن.</p>
-      <ul style="text-align: right;">
-        <li><span style="color:blue">🔵 کسر سبک</span>: صورت کوچک‌تر از مخرج</li>
-        <li><span style="color:green">🟢 کسر کامل</span>: صورت برابر مخرج</li>
-        <li><span style="color:red">🔴 کسر سنگین</span>: صورت بزرگ‌تر از مخرج</li>
-        <li><span style="color:orange">🟠 عدد ترکیبی</span>: عدد صحیح + کسر</li>
-      </ul>
-      <p>روی یک دکمهٔ رنگ کلیک کن، بعد روی خانه‌های درست.</p>
+    <!-- بازی ماتریس -->
+    <div class="game-card">
+      <div class="icon">🌸</div>
+      <h2>بازی ماتریس</h2>
+      <p>الگوهای رنگی را کشف کن و گل‌ها را رنگ کن!</p>
+      <button onclick="location.href='matrix.html'">شروع بازی</button>
     </div>
+
+    <!-- بازی جدول کسرها -->
+    <div class="game-card">
+      <div class="icon">🧩</div>
+      <h2>جدول کسرها</h2>
+      <p>انواع کسرها را تشخیص بده و در جای درست قرار بده.</p>
+      <button onclick="location.href='fractions-grid.html'">شروع بازی</button>
+    </div>
+
+    <!-- بازی کهکشان -->
+    <div class="game-card">
+      <div class="icon">🪐</div>
+      <h2>منظومهٔ شمسی</h2>
+      <p>سیارات را در مدارهای درستشان قرار بده!</p>
+      <button onclick="location.href='galaxy.html'">شروع بازی</button>
+    </div>
+
+    <!-- شبیه‌ساز کسرها -->
+    <div class="game-card">
+      <div class="icon">🧮</div>
+      <h2>ضرب و تقسیم کسرها</h2>
+      <p>با رسم شکل، ضرب و تقسیم کسرها را یاد بگیر!</p>
+      <button onclick="location.href='fractions-simulator.html'">شروع بازی</button>
+    </div>
+
   </div>
-
-  <script>
-    // تابع تبدیل کسر ساده به فرمت عمودی
-    function formatFraction(fractionStr) {
-      if (fractionStr.includes(' ')) {
-        // عدد مخلوط: مثل "۲ ۱/۳"
-        const parts = fractionStr.split(' ');
-        const whole = parts[0];
-        const frac = parts[1];
-        const [num, den] = frac.split('/');
-        return `${whole}&nbsp;<span class="fraction"><sup>${num}</sup><hr><sub>${den}</sub></span>`;
-      } else {
-        // کسر ساده: مثل "۳/۵"
-        const [num, den] = fractionStr.split('/');
-        return `<span class="fraction"><sup>${num}</sup><hr><sub>${den}</sub></span>`;
-      }
-    }
-
-    // لیست کسرها با اعداد لاتین (برای پردازش آسان)
-    const fractions = {
-      less: ['1/2', '2/3', '3/4', '1/5', '2/5', '3/5', '4/5', '1/6', '5/6', '2/7', '3/7', '4/9'],
-      equal: ['1/1', '2/2', '3/3', '4/4', '5/5', '6/6', '7/7', '8/8'],
-      greater: ['3/2', '4/3', '5/2', '7/3', '9/4', '6/5', '10/3', '8/5', '7/2', '9/2'],
-      mixed: ['1 1/2', '2 1/3', '1 2/3', '3 1/4', '2 3/5', '4 2/7', '1 3/4', '2 1/5']
-    };
-
-    // تبدیل اعداد لاتین به فارسی
-    function toPersianDigits(str) {
-      return str.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
-    }
-
-    let selectedType = null;
-    let score = 0;
-    let startTime = null;
-    let timerInterval = null;
-    let correctCount = 0;
-    const totalCells = 16;
-
-    function getRandomItems(arr, count) {
-      const shuffled = [...arr].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
-    }
-
-    function generateGrid() {
-      const grid = document.getElementById('fractionGrid');
-      grid.innerHTML = '';
-
-      const items = [
-        ...getRandomItems(fractions.less, 4).map(v => ({value: v, type: 'less'})),
-        ...getRandomItems(fractions.equal, 4).map(v => ({value: v, type: 'equal'})),
-        ...getRandomItems(fractions.greater, 4).map(v => ({value: v, type: 'greater'})),
-        ...getRandomItems(fractions.mixed, 4).map(v => ({value: v, type: 'mixed'}))
-      ];
-
-      items.sort(() => 0.5 - Math.random());
-
-      for (let i = 0; i < 4; i++) {
-        const row = document.createElement('tr');
-        for (let j = 0; j < 4; j++) {
-          const cell = document.createElement('td');
-          const item = items[i * 4 + j];
-          const persianValue = toPersianDigits(item.value);
-          cell.innerHTML = formatFraction(persianValue);
-          cell.dataset.type = item.type;
-          cell.addEventListener('click', () => handleCellClick(cell));
-          row.appendChild(cell);
-        }
-        grid.appendChild(row);
-      }
-    }
-
-    function startTimer() {
-      startTime = Date.now();
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        updateScoreDisplay(elapsed);
-      }, 1000);
-    }
-
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
-
-    function updateScoreDisplay(time = 0) {
-      document.getElementById('scoreTimer').textContent = `امتیاز: ${score} | زمان: ${time}s`;
-    }
-
-    function selectType(type) {
-      selectedType = type;
-      document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
-      const colorClass = 
-        type === 'less' ? 'blue' : 
-        type === 'equal' ? 'green' : 
-        type === 'greater' ? 'red' : 'orange';
-      document.querySelector(`.type-btn.${colorClass}`).classList.add('selected');
-      showMessage(`نوع "${getTypeName(type)}" انتخاب شد.`);
-    }
-
-    function getTypeName(type) {
-      return {
-        less: 'کسر سبک',
-        equal: 'کسر کامل',
-        greater: 'کسر سنگین',
-        mixed: 'عدد ترکیبی'
-      }[type];
-    }
-
-    function handleCellClick(cell) {
-      if (!selectedType) {
-        showMessage('اول یک نوع کسر را انتخاب کن!', true);
-        return;
-      }
-
-      const correctType = cell.dataset.type;
-      if (selectedType === correctType) {
-        cell.style.backgroundColor = 
-          selectedType === 'less' ? '#d1e7ff' :
-          selectedType === 'equal' ? '#d4edda' :
-          selectedType === 'greater' ? '#f8d7da' : '#ffe5b4';
-        cell.classList.add('correct');
-        score += 10;
-        correctCount++;
-        updateScoreDisplay(Math.floor((Date.now() - startTime) / 1000));
-        showMessage('آفرین! ✅');
-        if (correctCount === totalCells) {
-          stopTimer();
-          const finalTime = Math.floor((Date.now() - startTime) / 1000);
-          setTimeout(() => {
-            showMessage(`🎉 تبریک! امتیاز: ${score} — زمان: ${finalTime} ثانیه 🎉`);
-          }, 500);
-        }
-      } else {
-        cell.classList.add('error');
-        setTimeout(() => cell.classList.remove('error'), 500);
-        score = Math.max(0, score - 5);
-        updateScoreDisplay(Math.floor((Date.now() - startTime) / 1000));
-        showMessage('❌ اشتباه! این کسر مال این گروه نیست.', true);
-      }
-    }
-
-    function showMessage(text, isError = false) {
-      const msg = document.getElementById('message');
-      msg.textContent = text;
-      msg.className = isError ? 'error' : '';
-    }
-
-    function showHelp() {
-      document.getElementById('helpModal').style.display = 'block';
-    }
-
-    function closeHelp() {
-      document.getElementById('helpModal').style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-      const modal = document.getElementById('helpModal');
-      if (event.target === modal) closeHelp();
-    }
-
-    generateGrid();
-    startTimer();
-  </script>
 </body>
 </html>
