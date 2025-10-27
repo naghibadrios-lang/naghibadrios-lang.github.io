@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شبیه‌ساز کسرها — تقسیم بصری</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .designer {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    #helpBtn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 6px 12px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      z-index: 10;
+    }
+    .input-section {
+      margin: 20px auto;
+      max-width: 300px;
+    }
+    .fraction-input {
+      display: inline-block;
+      text-align: center;
+    }
+    .numerator, .denominator {
+      padding: 10px;
+      font-size: 18px;
+      width: 80px;
+      border: 2px solid #555;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .fraction-line {
+      height: 4px;
+      background: #333;
+      margin: 4px auto;
+      width: 80px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #visualization {
+      margin: 30px auto;
+      min-height: 120px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 700px;
+    }
+    .unit-container {
+      display: inline-block;
+      margin: 10px;
+      direction: ltr;
+    }
+    .unit-box {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #333;
+      display: grid;
+      background: white;
+    }
+    .part {
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .filled {
+      background: #4caf50;
+    }
+    #message {
+      margin: 15px;
+      min-height: 24px;
+      font-size: 17px;
+      color: #28a745;
+      font-weight: bold;
+    }
+    #message.error {
+      color: #dc3545;
+    }
+
+    /* Modal راهنما */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      background: white;
+      margin: 15% auto;
+      padding: 20px;
+      width: 85%;
+      max-width: 450px;
+      border-radius: 12px;
+      direction: rtl;
+    }
+    .close {
+      color: #888;
+      float: left;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="designer">Design by Badr</div>
+  <h1>شبیه‌ساز کسرها</h1>
+
+  <button id="helpBtn" onclick="showHelp()">راهنما</button>
+
+  <div class="input-section">
+    <p>کسر را وارد کنید:</p>
+    <div class="fraction-input">
+      <input type="text" id="numerator" class="numerator" placeholder="صورت" maxlength="2">
+      <div class="fraction-line"></div>
+      <input type="text" id="denominator" class="denominator" placeholder="مخرج" maxlength="2">
+    </div>
+    <br>
+    <button onclick="visualizeFraction()">نمایش</button>
+  </div>
+
+  <div id="message"></div>
+
+  <div id="visualization"></div>
+
+  <!-- Modal راهنما -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeHelp()">&times;</span>
+      <h3>راهنمای انواع کسرها</h3>
+      <ul style="text-align: right;">
+        <li><strong>کسر ساده (کوچک‌تر از واحد)</strong>: صورت < مخرج<br>مثال: ۲/۵</li>
+        <li><strong>کسر برابر واحد</strong>: صورت = مخرج<br>مثال: ۴/۴ = ۱</li>
+        <li><strong>کسر بزرگ‌تر از واحد</strong>: صورت > مخرج<br>مثال: ۷/۳</li>
+        <li><strong>عدد مخلوط</strong>: ترکیب عدد صحیح و کسر<br>مثال: ۲ ۱/۳</li>
+      </ul>
+      <p>هر واحد به تعداد «مخرج» بخش تقسیم می‌شود.</p>
+    </div>
+  </div>
+
+  <script>
+    function toPersianDigits(num) {
+      return String(num).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+
+    function showMessage(text, isError = false) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = isError ? 'error' : '';
+    }
+
+    function visualizeFraction() {
+      const numStr = document.getElementById('numerator').value.trim();
+      const denStr = document.getElementById('denominator').value.trim();
+
+      if (!numStr || !denStr) {
+        showMessage('لطفاً صورت و مخرج را وارد کنید!', true);
+        return;
+      }
+
+      const num = parseInt(numStr);
+      const den = parseInt(denStr);
+
+      if (isNaN(num) || isNaN(den)) {
+        showMessage('لطفاً فقط اعداد وارد کنید!', true);
+        return;
+      }
+
+      if (den <= 0) {
+        showMessage('مخرج باید عددی مثبت باشد!', true);
+        return;
+      }
+
+      if (num < 0) {
+        showMessage('صورت نمی‌تواند منفی باشد!', true);
+        return;
+      }
+
+      const whole = Math.floor(num / den);
+      const remainder = num % den;
+
+      const container = document.getElementById('visualization');
+      container.innerHTML = '';
+
+      // تابع برای ساخت یک واحد تقسیم‌شده
+      function createUnit(filledParts, totalParts) {
+        const unitDiv = document.createElement('div');
+        unitDiv.className = 'unit-container';
+        
+        const box = document.createElement('div');
+        box.className = 'unit-box';
+        box.style.gridTemplateColumns = `repeat(${totalParts}, 1fr)`;
+        box.style.gridTemplateRows = '1fr';
+
+        for (let i = 0; i < totalParts; i++) {
+          const part = document.createElement('div');
+          part.className = 'part';
+          if (i < filledParts) {
+            part.classList.add('filled');
+          }
+          box.appendChild(part);
+        }
+
+        unitDiv.appendChild(box);
+        return unitDiv;
+      }
+
+      // نمایش واحدهای کامل
+      for (let i = 0; i < whole; i++) {
+        container.appendChild(createUnit(den, den));
+      }
+
+      // نمایش باقی‌مانده
+      if (remainder > 0) {
+        container.appendChild(createUnit(remainder, den));
+      }
+
+      // پیام توضیحی
+      let type = '';
+      if (num < den) {
+        type = 'کسر ساده (کوچک‌تر از واحد)';
+      } else if (num === den) {
+        type = 'کسر برابر واحد';
+      } else if (remainder === 0) {
+        type = 'عدد صحیح';
+      } else {
+        type = 'عدد مخلوط';
+      }
+
+      let resultText = `کسر ${toPersianDigits(num)}/${toPersianDigits(den)} → ${type}`;
+      if (whole > 0 && remainder > 0) {
+        resultText += ` (${toPersianDigits(whole)} ${toPersianDigits(remainder)}/${toPersianDigits(den)})`;
+      }
+      showMessage(resultText);
+    }
+
+    function showHelp() {
+      document.getElementById('helpModal').style.display = 'block';
+    }
+
+    function closeHelp() {
+      document.getElementById('helpModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('helpModal');
+      if (event.target === modal) closeHelp();
+    };
+
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') visualizeFraction();
+    });
+  </script>
+</body>
+</html>

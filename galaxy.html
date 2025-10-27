@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منظومهٔ شمسی — Design by Badr</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #000;
+      color: white;
+      margin: 0;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+    .designer {
+      font-size: 14px;
+      color: #aaa;
+      margin: 8px 0;
+      font-style: italic;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 10px 0;
+      color: #ffeb3b;
+    }
+    #helpBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      background: #333;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      z-index: 30;
+    }
+    #errorCounter {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 14px;
+      color: #ff9800;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 8px;
+      border-radius: 6px;
+      z-index: 30;
+      font-weight: bold;
+    }
+    #solarSystem {
+      position: relative;
+      width: 340px;
+      height: 340px;
+      margin: 15px auto;
+    }
+    .sun {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle, #ffeb3b, #ff9800);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px #ffeb3b;
+      z-index: 10;
+    }
+    .orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .planet {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+      transition: transform 0.2s;
+      font-size: 9px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 2px black, 0 0 2px black;
+      user-select: none;
+    }
+    .planet.selected {
+      transform: scale(1.3);
+      box-shadow: 0 0 12px white;
+    }
+    #message {
+      margin: 12px;
+      min-height: 24px;
+      font-size: 17px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+    #message.error {
+      color: #f44336;
+    }
+    /* Modal راهنما */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+    }
+    .modal-content {
+      background: #222;
+      margin: 15% auto;
+      padding: 20px;
+      width: 85%;
+      max-width: 400px;
+      border-radius: 12px;
+      direction: rtl;
+      color: white;
+      border: 1px solid #444;
+    }
+    .close {
+      color: #aaa;
+      float: left;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="designer">Design by Badr</div>
+  <h1>منظومهٔ شمسی</h1>
+
+  <button id="helpBtn" onclick="showHelp()">راهنما</button>
+  <div id="errorCounter">اشتباهات: 0 از 2</div>
+
+  <div id="solarSystem">
+    <div class="sun"></div>
+  </div>
+
+  <div id="message">روی یک سیاره کلیک کن، بعد جای درستش را انتخاب کن.</div>
+
+  <!-- Modal راهنما -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeHelp()">&times;</span>
+      <h3>راهنمای بازی</h3>
+      <p>سیاره‌ها در جاهای اشتباه قرار گرفته‌اند.</p>
+      <p>✅ <strong>نحوهٔ بازی:</strong></p>
+      <ol style="text-align: right;">
+        <li>روی یک سیاره کلیک کن تا انتخاب شود.</li>
+        <li>بعد روی سیارهٔ دیگری کلیک کن تا جایشان عوض شود.</li>
+        <li>شما فقط <strong>۲ اشتباه</strong> مجاز هستید.</li>
+        <li>اگر ۲ بار اشتباه کنید، بازی از اول شروع می‌شود.</li>
+      </ol>
+      <p>هدف: همهٔ سیارات را در جای درستشان قرار بده!</p>
+    </div>
+  </div>
+
+  <script>
+    const correctOrder = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const planetNames = {
+      mercury: 'عطارد', venus: 'زهره', earth: 'زمین', mars: 'مریخ',
+      jupiter: 'مشتری', saturn: 'زحل', uranus: 'اورانوس', neptune: 'نپتون'
+    };
+    const initialWrongOrder = ['venus', 'earth', 'mars', 'mercury', 'saturn', 'jupiter', 'neptune', 'uranus'];
+    const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+
+    let selectedPlanetEl = null;
+    let errorCount = 0;
+    const maxErrors = 2;
+    let isAnimating = false;
+
+    const planetStyles = {
+      mercury: { bg: '#b0b0b0' },
+      venus: { bg: '#e39e1c' },
+      earth: { bg: 'radial-gradient(circle, #2196f3 60%, #4caf50 100%)' },
+      mars: { bg: '#cd5c5c' },
+      jupiter: { 
+        bg: '#d8ca9d',
+        img: 'repeating-linear-gradient(to right, transparent 0 4px, rgba(160,100,60,0.6) 4px 8px)'
+      },
+      saturn: { bg: '#e3e0c0' },
+      uranus: { bg: '#a6d3d8' },
+      neptune: { bg: '#4b6cb7' }
+    };
+
+    function createSolarSystem() {
+      const system = document.getElementById('solarSystem');
+      const centerX = 170;
+      const centerY = 170;
+
+      while (system.children.length > 1) system.removeChild(system.lastChild);
+
+      for (let i = 0; i < 8; i++) {
+        const radius = 50 + i * 26;
+        const orbit = document.createElement('div');
+        orbit.className = 'orbit';
+        orbit.style.width = `${radius * 2}px`;
+        orbit.style.height = `${radius * 2}px`;
+        system.appendChild(orbit);
+
+        const planet = document.createElement('div');
+        planet.className = 'planet';
+        planet.dataset.orbit = i;
+        const type = initialWrongOrder[i];
+        planet.dataset.type = type;
+        planet.textContent = planetNames[type];
+
+        const style = planetStyles[type];
+        planet.style.background = style.bg;
+        if (style.img) planet.style.backgroundImage = style.img;
+
+        const angle = angles[i] * Math.PI / 180;
+        const x = centerX + radius * Math.cos(angle) - 18;
+        const y = centerY + radius * Math.sin(angle) - 18;
+        planet.style.left = `${x}px`;
+        planet.style.top = `${y}px`;
+
+        planet.addEventListener('click', () => handlePlanetClick(planet));
+        system.appendChild(planet);
+      }
+    }
+
+    function handlePlanetClick(planet) {
+      if (isAnimating) return;
+      if (selectedPlanetEl === planet) {
+        planet.classList.remove('selected');
+        selectedPlanetEl = null;
+        showMessage('انتخاب لغو شد.');
+        return;
+      }
+
+      if (!selectedPlanetEl) {
+        document.querySelectorAll('.planet').forEach(p => p.classList.remove('selected'));
+        planet.classList.add('selected');
+        selectedPlanetEl = planet;
+        showMessage(`سیارهٔ ${planet.textContent} انتخاب شد.`);
+      } else {
+        const fromOrbit = parseInt(selectedPlanetEl.dataset.orbit);
+        const toOrbit = parseInt(planet.dataset.orbit);
+        if (fromOrbit === toOrbit) {
+          selectedPlanetEl.classList.remove('selected');
+          selectedPlanetEl = null;
+          return;
+        }
+
+        const tempType = selectedPlanetEl.dataset.type;
+        const tempText = selectedPlanetEl.textContent;
+        selectedPlanetEl.dataset.type = planet.dataset.type;
+        selectedPlanetEl.textContent = planet.textContent;
+        planet.dataset.type = tempType;
+        planet.textContent = tempText;
+
+        updatePlanetAppearance(selectedPlanetEl);
+        updatePlanetAppearance(planet);
+
+        if (planet.dataset.type !== correctOrder[toOrbit]) {
+          errorCount++;
+          updateErrorDisplay();
+          showMessage('❌ اشتباه! این سیاره مال این جا نیست.', true);
+          if (errorCount >= maxErrors) {
+            setTimeout(() => resetGame(), 1200);
+          }
+        } else {
+          showMessage('آفرین! ✅');
+        }
+
+        selectedPlanetEl.classList.remove('selected');
+        selectedPlanetEl = null;
+        checkWin();
+      }
+    }
+
+    function updatePlanetAppearance(planet) {
+      const type = planet.dataset.type;
+      const style = planetStyles[type];
+      planet.style.background = style.bg;
+      if (style.img) {
+        planet.style.backgroundImage = style.img;
+      } else {
+        planet.style.backgroundImage = 'none';
+      }
+    }
+
+    function updateErrorDisplay() {
+      document.getElementById('errorCounter').textContent = `اشتباهات: ${errorCount} از ${maxErrors}`;
+    }
+
+    function showMessage(text, isError = false) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = isError ? 'error' : '';
+    }
+
+    function checkWin() {
+      const planets = document.querySelectorAll('.planet');
+      for (let i = 0; i < planets.length; i++) {
+        if (planets[i].dataset.type !== correctOrder[i]) return false;
+      }
+      startOrbitAnimation();
+      showMessage('🎉 آفرین! منظومهٔ شمسی درست شد! 🎉');
+      return true;
+    }
+
+    function startOrbitAnimation() {
+      isAnimating = true;
+      const system = document.getElementById('solarSystem');
+      const planets = document.querySelectorAll('.planet');
+      const centerX = 170;
+      const centerY = 170;
+
+      // حذف موقعیت ثابت و اعمال انیمیشن
+      planets.forEach((planet, i) => {
+        const radius = 50 + i * 26;
+        planet.style.position = 'absolute';
+        planet.style.transformOrigin = `${centerX}px ${centerY}px`;
+        
+        // انیمیشن چرخش با سرعت متفاوت
+        const duration = 2 + i * 1.5; // سیارات دورتر کندتر
+        planet.style.animation = `orbit${i} ${duration}s linear infinite`;
+        
+        // تعریف keyframe برای هر سیاره
+        const style = document.createElement('style');
+        style.innerHTML = `
+          @keyframes orbit${i} {
+            from { transform: rotate(${angles[i]}deg) translate(${radius}px) rotate(${-angles[i]}deg); }
+            to { transform: rotate(${angles[i]}deg) translate(${radius}px) rotate(${360 - angles[i]}deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      });
+    }
+
+    function resetGame() {
+      errorCount = 0;
+      selectedPlanetEl = null;
+      isAnimating = false;
+      updateErrorDisplay();
+      createSolarSystem();
+      showMessage('بازی از اول شروع شد. دو اشتباه مجاز است.');
+    }
+
+    function showHelp() {
+      document.getElementById('helpModal').style.display = 'block';
+    }
+
+    function closeHelp() {
+      document.getElementById('helpModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('helpModal');
+      if (event.target === modal) closeHelp();
+    }
+
+    createSolarSystem();
+  </script>
+</body>
+</html>
