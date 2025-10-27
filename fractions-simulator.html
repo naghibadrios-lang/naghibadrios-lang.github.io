@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شبیه‌ساز ضرب و تقسیم کسرها</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 15px;
+      text-align: center;
+    }
+    .designer {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    #topControls {
+      margin: 10px 0;
+    }
+    button {
+      padding: 8px 14px;
+      font-size: 15px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .input-section {
+      margin: 15px auto;
+      max-width: 450px;
+    }
+    select {
+      padding: 7px;
+      font-size: 15px;
+      border: 2px solid #555;
+      border-radius: 6px;
+      margin: 0 10px;
+    }
+    .fraction-group {
+      display: inline-block;
+      margin: 0 8px;
+    }
+    .fraction-input {
+      display: inline-block;
+      text-align: center;
+    }
+    .numerator, .denominator {
+      padding: 7px;
+      font-size: 15px;
+      width: 55px;
+      border: 2px solid #555;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .frac-line {
+      height: 3px;
+      background: #333;
+      margin: 3px auto;
+      width: 55px;
+    }
+    #conversionBox {
+      margin: 15px auto;
+      max-width: 500px;
+      padding: 12px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      color: #0d47a1;
+      display: none;
+    }
+    #visualization {
+      margin: 20px auto;
+      display: inline-block;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .grid {
+      display: grid;
+      gap: 0;
+      border: 2px solid #333;
+      margin: 0 auto;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .yellow { background-color: rgba(241, 196, 15, 0.7); }
+    .blue { background-color: rgba(52, 152, 219, 0.7); }
+    .green { background-color: rgba(46, 204, 113, 0.9); }
+    #result {
+      margin: 15px auto;
+      max-width: 500px;
+      font-size: 17px;
+      font-weight: bold;
+      color: #27ae60;
+    }
+    #result.error {
+      color: #e74c3c;
+    }
+
+    /* Modal راهنما */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      background: white;
+      margin: 15% auto;
+      padding: 20px;
+      width: 85%;
+      max-width: 450px;
+      border-radius: 12px;
+      direction: rtl;
+    }
+    .close {
+      color: #888;
+      float: left;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="designer">Design by Badr</div>
+  <h1>شبیه‌ساز ضرب و تقسیم کسرها</h1>
+
+  <div id="topControls">
+    <button onclick="showHelp()">راهنما</button>
+    <button onclick="startSimulation()">شبیه‌سازی</button>
+    <button onclick="resetAll()">شروع دوباره</button>
+  </div>
+
+  <div class="input-section">
+    <select id="operation">
+      <option value="multiply">ضرب</option>
+      <option value="divide">تقسیم</option>
+    </select>
+    <br><br>
+    <div class="fraction-group">
+      <div class="fraction-input">
+        <input type="text" id="num1" class="numerator" placeholder="صورت ۱" maxlength="2">
+        <div class="frac-line"></div>
+        <input type="text" id="den1" class="denominator" placeholder="مخرج ۱" maxlength="2">
+      </div>
+    </div>
+    <span id="op-symbol" style="font-size:22px;">×</span>
+    <div class="fraction-group">
+      <div class="fraction-input">
+        <input type="text" id="num2" class="numerator" placeholder="صورت ۲" maxlength="2">
+        <div class="frac-line"></div>
+        <input type="text" id="den2" class="denominator" placeholder="مخرج ۲" maxlength="2">
+      </div>
+    </div>
+  </div>
+
+  <!-- کادر تبدیل تقسیم به ضرب -->
+  <div id="conversionBox"></div>
+
+  <div id="visualization"></div>
+  <div id="result"></div>
+
+  <!-- Modal راهنما -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeHelp()">&times;</span>
+      <h3>راهنمای شبیه‌ساز</h3>
+      <p><strong>برای ضرب کسرها:</strong></p>
+      <ul style="text-align: right;">
+        <li>کسر اول با رنگ <span style="color:#f1c40f;">زرد</span> نمایش داده می‌شود.</li>
+        <li>کسر دوم با رنگ <span style="color:#3498db;">آبی</span> اضافه می‌شود.</li>
+        <li>خانه‌های <span style="color:#2ecc71;">سبز</span> = جواب ضرب.</li>
+      </ul>
+      <p><strong>برای تقسیم کسرها:</strong></p>
+      <ul style="text-align: right;">
+        <li>ابتدا علامت تقسیم (÷) به ضرب (×) تبدیل می‌شود.</li>
+        <li>سپس کسر دوم معکوس می‌شود.</li>
+        <li>بعد از آن، همان روش ضرب اجرا می‌شود.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    let simulationData = null;
+    let currentOperation = 'multiply';
+
+    function persianToLatinDigits(str) {
+      return str
+        .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+        .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+    }
+
+    function toPersianDigits(num) {
+      return String(num).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+
+    function gcd(a, b) {
+      return b === 0 ? a : gcd(b, a % b);
+    }
+
+    function updateOperator() {
+      const op = document.getElementById('operation').value;
+      currentOperation = op;
+      document.getElementById('op-symbol').textContent = op === 'multiply' ? '×' : '÷';
+    }
+
+    function resetAll() {
+      document.getElementById('conversionBox').style.display = 'none';
+      document.getElementById('visualization').innerHTML = '';
+      document.getElementById('result').textContent = '';
+      document.getElementById('result').className = '';
+    }
+
+    function startSimulation() {
+      resetAll();
+      updateOperator();
+
+      let num1 = document.getElementById('num1').value.trim();
+      let den1 = document.getElementById('den1').value.trim();
+      let num2 = document.getElementById('num2').value.trim();
+      let den2 = document.getElementById('den2').value.trim();
+
+      num1 = persianToLatinDigits(num1);
+      den1 = persianToLatinDigits(den1);
+      num2 = persianToLatinDigits(num2);
+      den2 = persianToLatinDigits(den2);
+
+      const n1 = parseInt(num1);
+      const d1 = parseInt(den1);
+      const n2 = parseInt(num2);
+      const d2 = parseInt(den2);
+
+      if (isNaN(n1) || isNaN(d1) || isNaN(n2) || isNaN(d2)) {
+        showError('لطفاً فقط اعداد وارد کنید!');
+        return;
+      }
+
+      if (n1 <= 0 || d1 <= 0 || n2 <= 0 || d2 <= 0) {
+        showError('لطفاً اعداد مثبت وارد کنید!');
+        return;
+      }
+
+      if (d1 > 10 || d2 > 10) {
+        showError('لطفاً مخرج‌ها را کوچکتر از ۱۱ وارد کنید!');
+        return;
+      }
+
+      let displayN2 = n2, displayD2 = d2;
+      if (currentOperation === 'divide') {
+        // تبدیل به ضرب در معکوس
+        displayN2 = d2;
+        displayD2 = n2;
+
+        // نمایش کادر تبدیل
+        const conversionBox = document.getElementById('conversionBox');
+        conversionBox.innerHTML = `
+          تبدیل تقسیم به ضرب:<br>
+          ${toPersianDigits(n1)}/${toPersianDigits(d1)} ÷ ${toPersianDigits(n2)}/${toPersianDigits(d2)}
+          &nbsp;=&nbsp;
+          ${toPersianDigits(n1)}/${toPersianDigits(d1)} × ${toPersianDigits(displayN2)}/${toPersianDigits(displayD2)}
+        `;
+        conversionBox.style.display = 'block';
+      } else {
+        document.getElementById('conversionBox').style.display = 'none';
+      }
+
+      // شبیه‌سازی همیشه به صورت ضرب
+      simulateMultiplication(n1, d1, displayN2, displayD2);
+    }
+
+    function showError(msg) {
+      document.getElementById('result').textContent = msg;
+      document.getElementById('result').className = 'error';
+    }
+
+    function simulateMultiplication(n1, d1, n2, d2) {
+      const cols = d1;
+      const rows = d2;
+
+      const container = document.createElement('div');
+      container.className = 'grid';
+      container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+      container.style.width = `${cols * 40}px`;
+      container.style.height = `${rows * 40}px`;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+
+          const isYellow = c < n1;
+          const isBlue = r < n2;
+          const isOverlap = isYellow && isBlue;
+
+          if (isOverlap) {
+            cell.classList.add('green');
+          } else if (isYellow) {
+            cell.classList.add('yellow');
+          } else if (isBlue) {
+            cell.classList.add('blue');
+          }
+
+          container.appendChild(cell);
+        }
+      }
+
+      document.getElementById('visualization').innerHTML = '';
+      document.getElementById('visualization').appendChild(container);
+
+      const resultNum = n1 * n2;
+      const resultDen = d1 * d2;
+      const g = gcd(resultNum, resultDen);
+      const simpNum = resultNum / g;
+      const simpDen = resultDen / g;
+
+      let resultText = `جواب = ${toPersianDigits(resultNum)}/${toPersianDigits(resultDen)}`;
+      if (simpNum !== resultNum || simpDen !== resultDen) {
+        resultText += ` = ${toPersianDigits(simpNum)}/${toPersianDigits(simpDen)}`;
+      }
+      document.getElementById('result').textContent = resultText;
+      document.getElementById('result').className = '';
+    }
+
+    // راهنما
+    function showHelp() {
+      document.getElementById('helpModal').style.display = 'block';
+    }
+
+    function closeHelp() {
+      document.getElementById('helpModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('helpModal');
+      if (event.target === modal) closeHelp();
+    };
+
+    document.getElementById('operation').addEventListener('change', updateOperator);
+  </script>
+</body>
+</html>
